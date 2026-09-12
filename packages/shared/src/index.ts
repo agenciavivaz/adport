@@ -2,6 +2,7 @@ export * from './roles';
 export * from './events';
 export * from './adapter';
 export * from './diagnosis';
+export * from './csv';
 
 /** Estados de UI obrigatórios — PRD §7.3. */
 export const UI_STATES = [

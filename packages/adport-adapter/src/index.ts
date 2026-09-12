@@ -37,6 +37,22 @@ export function isProviderConfigured(provider: ProviderId): boolean {
 }
 
 /** Capacidades declaradas de um provedor não configurado (maturity: unvalidated). */
+export * from './money';
+export * from './providers/google';
+
+import { GoogleAdsAdapter, readGoogleAdsConfig } from './providers/google';
+
+/**
+ * Registra os adapters conforme a configuração do ambiente (bootstrap do servidor).
+ * Idempotente. Provedores sem config permanecem não registrados (gate de ativação).
+ */
+export function registerConfiguredAdapters(): void {
+  const g = readGoogleAdsConfig();
+  if (g && !registry.has('google_ads')) {
+    registerAdapter('google_ads', () => new GoogleAdsAdapter(g));
+  }
+}
+
 export function unconfiguredCapabilities(provider: ProviderId): SourceCapabilities {
   return {
     provider,

@@ -5,7 +5,7 @@
 > persistência, autorização, estados de erro e testes fazem parte da tarefa.
 
 **Última atualização:** 2026-09-12
-**Etapa atual:** Etapa 1 · Fase 1.1 (Fundação SaaS e super admin)
+**Etapa atual:** Etapa 1 · Fase 1.2 (Google Ads e pipeline de dados) — núcleo independente concluído
 **Base:** repositório iniciado do zero (não havia commits). Incorporação do
 upstream Adport documentada como pendência externa em `docs/adport-upstream.md`.
 
@@ -63,12 +63,31 @@ CI; T04/T05 (super admin/suporte) dependem do serviço de suporte (fase 1.5).
 
 ---
 
+## Etapa 1 · Fase 1.2 — Google Ads e pipeline de dados
+
+Requisitos: ADS-01, ADS-03..ADS-08; arquitetura de jobs e raw/normalized.
+
+| Entrega | Estado | Evidência |
+|---|---|---|
+| OAuth Google, seleção de conta e associação ao cliente | 🟡 | `start_oauth`/`consume_oauth_state` (state único vinculado ao ator, PKCE S256), rotas `/connections/google/start` e `/oauth/google/callback`, `buildAuthUrl` testado. Troca código→token e cofre: ⛔ dependem de credenciais + incorporação upstream (flag desligada). |
+| Adapter tipado, sync inicial/incremental, filas, locks, retries, reconexão | 🟡 | `sync_jobs` com lease + `FOR UPDATE SKIP LOCKED`, `claim/complete/fail/reap`, backoff exponencial + jitter, DLQ; `GoogleAdsAdapter` atrás da fronteira. Camada de rede real: ⛔ upstream. Worker `/api/v1/internal/dispatch` autenticado por segredo. |
+| Entidades e fatos diários; IDs, moeda, timezone, conversões preservados | ✅ | Migrations `0007` (campaigns/ad_groups/ads/facts/breakdowns/conversion actions); **UPSERT idempotente** `ingest_ad_daily_facts`; micros convertidos uma vez (`microsToAmount`, testado). |
+| CSV de mídia, dry-run e resumo de importação | ✅ | `parseMediaCsv` (validação/dedup/erros, testado), rota `/imports/media?action=dry_run\|commit`, RPC `import_media_facts` (namespace separado, idempotente), UI de importação. |
+| Tela de conexão e qualidade; checkpoints e DLQ no super admin | ✅ | `/app/[org]/clients/[client]/connections` (status, sync, CSV, qualidade); DLQ real em `/platform`. |
+
+**Gate G2** — conta Google real reconcilia período fechado; reprocessar partição não
+duplica gasto; timeout/retry retomam sem perda; token fora de frontend/logs.
+**Estado:** 🟡 validado em Postgres real o que independe de credenciais: **reimportar a
+mesma partição mantém 2 fatos e spend 1500 (não 3000)** — não duplica; lease/lock impede
+claim concorrente; falha aplica backoff e vai à DLQ após max tentativas; cooldown de 15 min
+ativo. Reconciliação com conta Google real e "token fora de logs" em tráfego real: ⛔
+dependem de credenciais + incorporação da camada de rede upstream.
+
 ## Fases seguintes (não iniciadas — resumo)
 
 | Fase | Objetivo | Estado |
 |---|---|---|
-| 1.2 Google Ads e pipeline de dados | Primeira fonte real (OAuth, filas, fatos) | ⬜ (adapter boundary e schema de jobs preparados) |
-| 1.3 Dashboards, Meta e comparação | Análise multicanal com semântica correta | ⬜ |
+| 1.3 Dashboards, Meta e comparação | Análise multicanal com semântica correta | ⬜ (fatos e camada de ingestão prontos) |
 | 1.4 IA, alertas e relatórios | Diagnóstico acionável com evidências | ⬜ (schema de diagnóstico e contrato de tools definidos em `packages/shared`) |
 | 1.5 Cobrança, operação e piloto | SaaS contratável | ⬜ (adapter de billing e ledger de uso preparados) |
 | 1.6 Operações de ads com aprovação | Execução controlada | ⬜ |

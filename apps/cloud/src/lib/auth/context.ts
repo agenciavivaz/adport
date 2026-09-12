@@ -21,6 +21,20 @@ export interface ResolvedAccess {
   ctx: AccessContext;
 }
 
+/**
+ * Resolve o acesso e garante que o usuário acessa um cliente específico.
+ * Retorna null se não há acesso à org OU ao cliente (404 sem revelar — §14.1).
+ */
+export async function resolveClientAccess(
+  orgSelector: string,
+  clientId: string,
+): Promise<ResolvedAccess | null> {
+  const access = await resolveAccess(orgSelector);
+  if (!access) return null;
+  if (!access.ctx.clientIds.has(clientId)) return null;
+  return access;
+}
+
 /** Retorna null quando não há sessão. */
 export async function getCurrentUser() {
   const supabase = await createSupabaseServerClient();

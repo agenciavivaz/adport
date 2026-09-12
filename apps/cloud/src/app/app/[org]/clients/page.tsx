@@ -32,6 +32,7 @@ export default async function ClientsPage({ params }: { params: Promise<{ org: s
                 <th>Fuso</th>
                 <th>Modelo</th>
                 <th>Status</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -43,6 +44,11 @@ export default async function ClientsPage({ params }: { params: Promise<{ org: s
                   <td className="muted">{c.business_model}</td>
                   <td>
                     <span className={`badge ${c.status === 'active' ? 'ok' : 'warn'}`}>{c.status}</span>
+                  </td>
+                  <td>
+                    <a href={`/app/${access.organization.slug}/clients/${c.id}/connections`}>
+                      Conexões
+                    </a>
                   </td>
                 </tr>
               ))}

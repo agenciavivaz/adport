@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   // Pacotes do workspace são consumidos como TypeScript-fonte.
-  transpilePackages: ['@ai/shared', '@ai/domain'],
+  transpilePackages: ['@ai/shared', '@ai/domain', '@ai/adport-adapter'],
   experimental: {
     typedRoutes: false,
   },
