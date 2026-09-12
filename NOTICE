@@ -1,0 +1,16 @@
+Agency Intelligence
+Copyright 2026 Vivaz Agência (proprietário do projeto)
+
+Este produto é um trabalho derivado planejado sobre o projeto Adport
+(https://github.com/ynnickw/adport), licenciado sob Apache License 2.0.
+
+Estado da incorporação do upstream: PENDENTE (ver docs/adport-upstream.md).
+Nenhum código-fonte do upstream Adport foi copiado para este repositório
+ainda; a fronteira de integração está isolada em packages/adport-adapter para
+incorporação controlada com commit fixado, conforme PRD §3.
+
+Ao incorporar código do upstream:
+  - preservar LICENSE e avisos de copyright originais;
+  - identificar arquivos modificados (Apache 2.0, cláusula 4b);
+  - registrar SHA, data e patches em docs/adport-upstream.md;
+  - não usar a marca "Adport" como marca própria (Apache 2.0, cláusula 6).

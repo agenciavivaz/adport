@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+.next/
+out/
+*.tsbuildinfo
+
+# Environment / secrets — NEVER commit real values
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+.supabase/
+
+# Logs and OS
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+coverage/
+.vitest/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
